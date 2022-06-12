@@ -1,6 +1,6 @@
 # Elevator pitch
 
-The [Bevy game engine](https://bevyengine.org/) uses an Entity-Component-System (ECS) engine to manage all the game objects and logic. It does some type system magic. I think type system magic is cool. I believe you have said that you think type system magic is cool. I would like to propose that you implement, live on a stream, some variation on the Bevy ECS.
+The [Bevy game engine](https://bevyengine.org/) uses an Entity-Component-System (ECS) engine to manage all the game objects and logic. It does some type system magic. I think type system magic is cool. I believe you have said that you think type system magic is cool. I would like to propose that you implement, live on a stream, some variation on the Bevy ECS. In particular, 
 
 # General ECS overview
 
@@ -55,13 +55,24 @@ fn main() {
 ```
 This piece of code creates an app, adds a plugin to get an event loop, registers five entities, with a `Name` component (by using `add_startup_system()`, which is a `system` that runs once at app startup). It then adds a system that in each time through the event loop looks for every entity with a `Name` component, through the `Query::iter()` call, and prints out a greeting from the name. The `commands: Commands` variable is a struct that wraps and exposes `app`'s game world to facilitate making changes to said game world in a nice and controlled manner.
 
+The output is an infinite loop, printing
+```
+Hello Elaina Proctor!
+Hello Renzo Hume!
+Hello Zayna Nieves!
+```
+to the terminal.
+
 # Slightly more advanced Bevy example
 
-Here is a slightly more advanced example that showcases the full ECS functionality that I think is relevant to this project:
+Here is a second example that showcases the full ECS functionality that I think is relevant to this project:
 
 ```rust
 use bevy::app::ScheduleRunnerPlugin;
 use bevy::prelude::{App, Commands, Component, Query, With};
+
+#[derive(Component)]
+struct AccessCounter(u64);
 
 #[derive(Component)]
 struct Person;
@@ -77,33 +88,40 @@ fn add_people(mut commands: Commands) {
         .spawn()
         .insert(Person)
         .insert(FirstName("Elaina".to_string()))
-        .insert(LastName("Proctor".to_string()));
+        .insert(LastName("Proctor".to_string()))
+        .insert(AccessCounter(0));
     commands
         .spawn()
         .insert(Person)
         .insert(FirstName("Renzo".to_string()))
-        .insert(LastName("Hume".to_string()));
+        .insert(LastName("Hume".to_string()))
+        .insert(AccessCounter(0));
     commands
         .spawn()
         .insert(Person)
         .insert(FirstName("Zayna".to_string()))
-        .insert(LastName("Nieves".to_string()));
-    commands
-        .spawn()
-        .insert(Person);
+        .insert(LastName("Nieves".to_string()))
+        .insert(AccessCounter(0));
     commands
         .spawn()
         .insert(Person)
-        .insert(FirstName("George".to_string()));
+        .insert(AccessCounter(0));
+    commands
+        .spawn()
+        .insert(Person)
+        .insert(FirstName("George".to_string()))
+        .insert(AccessCounter(0));
     commands
         .spawn()
         .insert(FirstName("Lake".to_string()))
-        .insert(LastName("Ontario".to_string()));
+        .insert(LastName("Ontario".to_string()))
+        .insert(AccessCounter(0));
 }
 
-fn greet_people(query: Query<(&FirstName, &LastName), With<Person>>) {
-    for (fname, lname) in query.iter() {
-        println!("Hello {} {}!", fname.0, lname.0);
+fn greet_people(query: Query<(&FirstName, &LastName, &mut AccessCounter), With<Person>>) {
+    for (fname, lname, counter) in query.iter() {
+        AccesCounter.0 += 1;
+        println!("Hello {} {}, for the {}th time!", fname.0, lname.0, counter.0);
     }
 }
 
@@ -115,3 +133,8 @@ fn main() {
         .run();
 }
 ```
+
+The output is identical to the first case, but what's going on here is a bit more advanced. We now have three components; a marker component `Person`, and then splitting `Name` into `FirstName` and `LastName`. The `Query` now fetches the `FirstName` and `LastName` components on all the entities that have both of them, and which also have the `Person` component.
+
+# Project proposal
+
