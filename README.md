@@ -147,7 +147,7 @@ Hello Renzo Hume, for the 4th time!
 ```
 (and so on...) What's going on here is a bit more advanced. We now have four components; a marker component `Person`, and splitting `Name` into `FirstName` and `LastName`. In addition we have a counter to keep track of how many times we've greeted each person.
 
-The `Query` now fetches the `FirstName`, `LastName` and `AccessCounter` components on all the entities that all three of them, and which also have the `Person` component. Which is to say, only the first two people ever get greeted. Also, the `AccessCoutner` component is accessed mutably so that we can actually increment the counter. `Query`'s first 
+The `Query` now fetches the `FirstName`, `LastName` and `AccessCounter` components on all the entities that have all three of them, and which also have the `Person` component. Which is to say, only the first two people ever get greeted. Also, the `AccessCoutner` component is accessed mutably so that we can actually increment the counter. `Query`'s first 
 
 # Project proposal
 
