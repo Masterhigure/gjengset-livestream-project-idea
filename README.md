@@ -162,7 +162,7 @@ Some details from these two examples are _not_, in my opinion, crucial to this p
 
  - The `#[derive(Component)]` macro
  - The fact that entities and components are registered inside a system, and similar implementation details
- - Or even the ability to register (or deregister) entities and components inside a system at all
+ - Or even the ability to register (or deregister) entities and components inside a system at all, and thus the need for a `Commands` argument
  - The ability to add or remove components from an entity after registration
  - The entire `Plugin` concept
  - `Resource`s, which are singleton structs carrying global game information (such as e.g. game time, game settings, sprite sheets, and renderers), available as optional arguments to systems the way `Query`s are
