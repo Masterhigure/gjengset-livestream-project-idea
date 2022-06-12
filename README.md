@@ -102,7 +102,7 @@ fn add_people(mut commands: Commands) {
 }
 
 fn greet_people(query: Query<(&FirstName, &LastName), With<Person>>) {
-    for fname, lname in query.iter() {
+    for (fname, lname) in query.iter() {
         println!("Hello {} {}!", fname.0, lname.0);
     }
 }
