@@ -61,7 +61,7 @@ Hello Elaina Proctor!
 Hello Renzo Hume!
 Hello Zayna Nieves!
 ```
-to the terminal.
+over and over to the terminal.
 
 # Slightly more advanced Bevy example
 
@@ -100,8 +100,7 @@ fn add_people(mut commands: Commands) {
         .spawn()
         .insert(Person)
         .insert(FirstName("Zayna".to_string()))
-        .insert(LastName("Nieves".to_string()))
-        .insert(AccessCounter(0));
+        .insert(LastName("Nieves".to_string()));
     commands
         .spawn()
         .insert(Person)
@@ -118,9 +117,9 @@ fn add_people(mut commands: Commands) {
         .insert(AccessCounter(0));
 }
 
-fn greet_people(query: Query<(&FirstName, &LastName, &mut AccessCounter), With<Person>>) {
-    for (fname, lname, counter) in query.iter() {
-        AccesCounter.0 += 1;
+fn greet_people(mut query: Query<(&FirstName, &LastName, &mut AccessCounter), With<Person>>) {
+    for (fname, lname, mut counter) in query.iter_mut() {
+        counter.0 += 1;
         println!("Hello {} {}, for the {}th time!", fname.0, lname.0, counter.0);
     }
 }
@@ -133,8 +132,35 @@ fn main() {
         .run();
 }
 ```
+This time the output is
+```
+Hello Elaina Proctor, for the 1th time!
+Hello Renzo Hume, for the 1th time!
+Hello Elaina Proctor, for the 2th time!
+Hello Renzo Hume, for the 2th time!
+Hello Elaina Proctor, for the 3th time!
+Hello Renzo Hume, for the 3th time!
+Hello Elaina Proctor, for the 4th time!
+Hello Renzo Hume, for the 4th time!
+```
+(and so on...) What's going on here is a bit more advanced. We now have four components; a marker component `Person`, and splitting `Name` into `FirstName` and `LastName`. In addition we have a counter to keep track of how many times we've greeted each person.
 
-The output is identical to the first case, but what's going on here is a bit more advanced. We now have three components; a marker component `Person`, and then splitting `Name` into `FirstName` and `LastName`. The `Query` now fetches the `FirstName` and `LastName` components on all the entities that have both of them, and which also have the `Person` component.
+The `Query` now fetches the `FirstName`, `LastName` and `AccessCounter` components on all the entities that all three of them, and which also have the `Person` component. Which is to say, only the first two people ever get greeted. Also, the `AccessCoutner` component is accessed mutably so that we can actually increment the counter. `Query`'s first 
 
 # Project proposal
 
+There are a few core parts to this that I think are crucial.
+
+ - An `App` struct where you can register entities, their components, and the systems that act on them
+ - Systems can have any number of `Query` arguments
+ - An event loop in `App::run()` which calls all the registered systems
+ - The `Query` struct, which filters and iterates over entities, and zips their components (this struct seems like magic to me, and it's maybe the main reason for my interest in this project)
+
+Some details from the examples are _not_, in my opinion, crucial to this project, but could make for nice extras:
+
+ - The `#[derive(Component)]` macro
+ - The fact that entities and components are registered inside a system, and similar implementation details
+ - Or even the ability to register (or deregister) entities and components inside a system at all
+ - The ability to add or remove components from an entity after registration
+ - The entire `Plugin` concept
+ - `Resource`s, which are singleton structs carrying global game information (such as e.g. game time, game settings, sprite sheets, and renderers), available as optional arguments to systems the way `Query`s are
