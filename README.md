@@ -1,6 +1,6 @@
 # Elevator pitch
 
-The Bevy game engine uses an Entity-Component-System (ECS) engine to manage all the game objects and logic. It does some type system magic. I think type system magic is cool. I believe you have said that you think type system magic is cool. Does this fall under your idea of cool type system magic? That's up to you. I would like to propose that you implement, live on a stream, a simplified version of the Bevy ECS.
+The [Bevy game engine](https://bevyengine.org/) uses an Entity-Component-System (ECS) engine to manage all the game objects and logic. It does some type system magic. I think type system magic is cool. I believe you have said that you think type system magic is cool. Does this fall under your idea of cool type system magic? That's up to you. I would like to propose that you implement, live on a stream, a simplified version of the Bevy ECS.
 
 # General ECS overview
 
@@ -21,20 +21,34 @@ As a concrete example of a very simple ECS, the entities could be `usize` IDs, t
 Here is a simple example of the Bevy ECS in action (taken from the getting started section of the [Bevy Book](https://bevyengine.org/learn/book/getting-started/ecs/)):
 
 ```rust
+use bevy::app::ScheduleRunnerPlugin;
+use bevy::prelude::{App, Commands, Component, Query, With};
+
 #[derive(Component)]
 struct Person;
 
 #[derive(Component)]
 struct Name(String);
 
-fn hello_world() {
-    println!("hello world!");
-}
-
 fn add_people(mut commands: Commands) {
-    commands.spawn().insert(Person).insert(Name("Elaina Proctor".to_string()));
-    commands.spawn().insert(Person).insert(Name("Renzo Hume".to_string()));
-    commands.spawn().insert(Person).insert(Name("Zayna Nieves".to_string()));
+    commands
+        .spawn()
+        .insert(Person)
+        .insert(Name("Elaina Proctor".to_string()));
+    commands
+        .spawn()
+        .insert(Person)
+        .insert(Name("Renzo Hume".to_string()));
+    commands
+        .spawn()
+        .insert(Person)
+        .insert(Name("Zayna Nieves".to_string()));
+    commands
+        .spawn()
+        .insert(Person);
+    commands
+        .spawn()
+        .insert(Name("Jane Doe".to_string()));
 }
 
 fn greet_people(query: Query<&Name, With<Person>>) {
@@ -45,9 +59,10 @@ fn greet_people(query: Query<&Name, With<Person>>) {
 
 fn main() {
     App::new()
+        .add_plugin(ScheduleRunnerPlugin::default())
         .add_startup_system(add_people)
-        .add_system(hello_world)
         .add_system(greet_people)
         .run();
 }
 ```
+This piece of code creates an app, adds a plugin to get an event loop, registers five entities, with `Person` and `Name` components (by using `add_startup_system()`, which is a `system` that runs once at app startup), then adds a system that in each event loop looks for every entity with a `Name` component and also a `Person` component, and prints out a greeting from the name. This system will ignore the two last entities that are added inside `add_people`, because they 
