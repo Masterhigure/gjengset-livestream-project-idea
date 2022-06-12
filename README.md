@@ -1,6 +1,6 @@
 # Elevator pitch
 
-The [Bevy game engine](https://bevyengine.org/) uses an Entity-Component-System (ECS) engine to manage all the game objects and logic. It does some type system magic. I think type system magic is cool. I believe you have said that you think type system magic is cool. I would like to propose that you implement, live on a stream, some variation on the Bevy ECS. In particular, 
+The [Bevy game engine](https://bevyengine.org/) uses an Entity-Component-System (ECS) library to manage all the game objects and logic. It does some kind of type system magic. I would like to propose that you implement, on a livestream, some (simplified) variation on the Bevy ECS.
 
 # General ECS overview
 
@@ -18,7 +18,7 @@ As a concrete example of a very simple ECS, the entities could be `usize` IDs, t
 
 # Simple Bevy example
 
-Here is a simple example of the Bevy ECS in action (taken from the Getting Started section of the [Bevy Book](https://bevyengine.org/learn/book/getting-started/ecs/)):
+Here is a simple example of the Bevy ECS in action (taken from the Getting Started section of the [Bevy Book](https://bevyengine.org/learn/book/getting-started/ecs/), and using Bevy v0.7.0):
 
 ```rust
 use bevy::app::ScheduleRunnerPlugin;
@@ -53,7 +53,9 @@ fn main() {
         .run();
 }
 ```
-This piece of code creates an app, adds a plugin to get an event loop, registers five entities, with a `Name` component (by using `add_startup_system()`, which is a `system` that runs once at app startup). It then adds a system that in each time through the event loop looks for every entity with a `Name` component, through the `Query::iter()` call, and prints out a greeting from the name. The `commands: Commands` variable is a struct that wraps and exposes `app`'s game world to facilitate making changes to said game world in a nice and controlled manner.
+In the `main()` function we create an app, add a plugin to get an event loop, and register three entities with a `Name` component (by using `add_startup_system()`, which registers a system to run only once at app startup). We then add a system that in each time through the event loop looks for every entity with a `Name` component, through the `Query::iter()` call, and then it prints out a greeting using the `String` inside that `Name` component.
+
+The `commands: Commands` variable is a struct that wraps and exposes the `App`'s game world to facilitate making changes to said game world in a nice and controlled manner.
 
 The output is an infinite loop, printing
 ```
@@ -65,7 +67,7 @@ over and over to the terminal.
 
 # Slightly more advanced Bevy example
 
-Here is a second example that showcases the full ECS functionality that I think is relevant to this project:
+Here is a second example that showcasesa bit more of what the Bevy ECS, and in particular the `Query` struct, is capable of:
 
 ```rust
 use bevy::app::ScheduleRunnerPlugin;
@@ -156,7 +158,7 @@ There are a few core parts to this that I think are crucial.
  - An event loop in `App::run()` which calls all the registered systems
  - The `Query` struct, which filters and iterates over entities, and zips their components (this struct seems like magic to me, and it's maybe the main reason for my interest in this project)
 
-Some details from the examples are _not_, in my opinion, crucial to this project, but could make for nice extras:
+Some details from these two examples are _not_, in my opinion, crucial to this project. But they could make for nice extras:
 
  - The `#[derive(Component)]` macro
  - The fact that entities and components are registered inside a system, and similar implementation details
@@ -164,3 +166,24 @@ Some details from the examples are _not_, in my opinion, crucial to this project
  - The ability to add or remove components from an entity after registration
  - The entire `Plugin` concept
  - `Resource`s, which are singleton structs carrying global game information (such as e.g. game time, game settings, sprite sheets, and renderers), available as optional arguments to systems the way `Query`s are
+ - Performance
+
+# Why it's important to teach
+
+I think type system magic is cool, and I don't think I'm alone in that. How in the blazes they manage to do things like the system registration and the contruction of the `Query` objects for each system call is beyond me, and I don't think I'm alone in that. Also, Bevy is a cool project, and I think it would be cool to shed some light on what kind of things are going on (or at least might be going on) under the hood of their engine.
+
+# Why it's possible to teach in the format that you do
+
+This seems to me like a good fit alongside other livestreams you've done: Take some specification (either from some article or from an earlier implementation), and try to implement it or a variation of it yourself, while youtube and twitch watch.
+
+# Why it's more important to teach than other things
+
+I can't see many recent live coding videos from you where you dive deep into the actual type system in Rust and the powers it has. Looking back over the previous year, and judging from the titles and what little I can remember, it has been pretty focused on concurrency. Which, if you want to keep doing that, then I have no right or power to stop you. But if you want to change gears, then I think this is a good oppurtunity to look into a different aspect of Rust.
+
+# Why you should be the one to teach it
+
+I do seem to recall you saying you thought the type system of Rust is cool, so I hope this sounds intriguing to you. And I may not have scoured the internet looking for Rust videos over the years, but a few creators have popped up in my feed, and among those you are the only one who does longer coding content of the form that I suspect this requires.
+
+# Disclaimer
+
+I may have completely misjudged what my proposed project requires. It may be too long for your format, or too full of uninteresting boilerplate, or any number of other different reasons that it's not a good fit. I may have completely misjudged what kind of project this is (maybe there is no type magic going on, and everything just falls into place from using a few auto traits at clever and strategic locations). 
